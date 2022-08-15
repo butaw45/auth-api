@@ -1,6 +1,6 @@
 const config = {
   port: process.env.PORT,
-  accessKey: process.env.ACCESS_KEYY,
+  accessKey: process.env.ACCESS_KEY,
   refreshKey: process.env.REFRESH_KEY,
 };
 
