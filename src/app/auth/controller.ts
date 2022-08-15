@@ -72,6 +72,31 @@ class Auth {
       return next(error);
     }
   }
+  refreshToken(req: Request, res: Response, next: NextFunction) {
+    const cookie = req.cookies as { jwt: string };
+
+    if (!cookie?.jwt) return res.sendStatus(401);
+
+    const refreshToken = cookie.jwt;
+
+    const user = db.filter((item) => item.refreshToken === refreshToken);
+    if (user.length < 1) return res.sendStatus(401);
+
+    try {
+      const decode = jwt.verify(refreshToken, config.refreshKey as string) as {
+        email: string;
+      };
+      const accessToken = jwt.sign(
+        { email: decode.email },
+        config.accessKey as string,
+        { expiresIn: '30s' }
+      );
+
+      return res.status(200).json({ accessToken });
+    } catch (error) {
+      return next(error);
+    }
+  }
 }
 
 export default Auth;
