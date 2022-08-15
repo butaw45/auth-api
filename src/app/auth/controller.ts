@@ -97,6 +97,31 @@ class Auth {
       return next(error);
     }
   }
+  async logout(req: Request, res: Response, next: NextFunction) {
+    const cookie = req.cookies as { jwt: string };
+
+    if (!cookie?.jwt) return res.sendStatus(204);
+
+    const refreshToken = cookie.jwt;
+    const user = db.filter((item) => item.refreshToken === refreshToken);
+
+    if (user.length < 1) {
+      res.clearCookie('jwt', { httpOnly: true });
+      return res.sendStatus(204);
+    }
+    const otherUser = db.filter((item) => item.refreshToken !== refreshToken);
+    const currentUser = { ...user[0], refreshToken: '' };
+    const setUser = [...otherUser, currentUser];
+
+    try {
+      await createFile(setUser);
+
+      res.clearCookie('jwt', { httpOnly: true });
+      return res.sendStatus(204);
+    } catch (error) {
+      return next(error);
+    }
+  }
 }
 
 export default Auth;
