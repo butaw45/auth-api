@@ -66,6 +66,7 @@ class Auth {
       const oneDay = 24 * 60 * 60 * 1000;
 
       await createFile(setUser);
+      //gunakan secure:true pada res.cooke saat production
       res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: oneDay });
       return res.status(200).json({ token: accessToken });
     } catch (error) {
